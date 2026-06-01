@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasacode Studio — Wajah Digital Premium Anda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Background: Obsidian Charcoal (Menggantikan warna Navy lama)
+            navy: '#141619',
+            'navy-light': '#1F2327', /* Versi agak terang untuk kotak/card */
+            'navy-dark': '#0B0C0E',  /* Versi lebih gelap */
+
+            // Logo & Aksen: Neo-Mint (Menggantikan warna Gold lama)
+            gold: '#46D39E',
+            'gold-light': '#6BE0B3', /* Versi mint yang lebih muda/terang */
+            
+            // Menggantikan warna hijau Emerald (seperti tombol WA) agar senada dengan Neo-Mint
+            emerald: '#46D39E',
+            'emerald-light': '#6BE0B3',
+
+            // Teks & Detail: Alabaster White (Menggantikan warna Offwhite lama)
+            offwhite: '#F4F4F2',
+          },
+          fontFamily: {
+            display: ['Open Sans', 'sans-serif'], 
+            body: ['DM Sans', 'sans-serif'],
+          },
+        }
+      }
+    }
+</script>
+
+  <style>
+    
+    /* Rumus Animasi Teks Muncul dari Bawah */
+    .efek-cta-keren {
+        display: inline-block; /* Supaya animasinya lancar */
+        background: linear-gradient(45deg, #46D39E, #46D39E);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent; 
+        animation: munculKeAtas 1s ease-out forwards;
+        opacity: 0;
+    }
+
+    @keyframes munculKeAtas {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: #F8F9FA; color: #141619; }
+
+    /* ── Gold accent line ── */
+    .gold-line { height: 2px; background: linear-gradient(90deg, #46D39E, transparent); }
+    .gold-line-center { height: 2px; background: linear-gradient(90deg, transparent, #46D39E, transparent); }
+
+    /* ── Noise texture overlay ── */
+    .noise::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.15;
+    }
+
+    /* ── Hero dot grid ── */
+    .dot-grid {
+      background-image: radial-gradient(circle, rgba(212,175,55,0.18) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ── Animated underline ── */
+    .underline-gold {
+      position: relative; display: inline-block;
+    }
+    .underline-gold::after {
+      content: '';
+      position: absolute; left: 0; bottom: -4px;
+      width: 100%; height: 3px;
+      background: #46D39E;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+    }
+    .underline-gold:hover::after { transform: scaleX(1); }
+
+    /* ── Project Card ── */
+    .project-card {
+      background: #fff;
+      border: 1px solid rgba(70, 211, 158, 1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1), border-color 0.3s;
+      will-change: transform;
+    }
+    .project-card:hover {
+      transform: translateY(-10px) scale(1.012);
+      box-shadow: 0 28px 60px rgba(26,43,76,0.18), 0 0 0 1px rgba(70, 211, 158, 1);
+      border-color: rgba(70, 211, 158, 1);
+    }
+    .project-card:hover .card-thumb-overlay { opacity: 1; }
+    .project-card:hover .thumb-img { transform: scale(1.06); }
+
+    .card-thumb-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(26,43,76,0.55), rgba(46,139,87,0.35));
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .thumb-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    /* ── CTA Button pulse ── */
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(46,139,87,0.4); }
+      70%  { box-shadow: 0 0 0 12px rgba(46,139,87,0); }
+      100% { box-shadow: 0 0 0 0 rgba(46,139,87,0); }
+    }
+    .btn-pulse { animation: pulse-ring 2.2s infinite; }
+
+    /* ── Pricing card ── */
+    .pricing-card {
+      background: #fff;
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 16px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+    }
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(26,43,76,0.12);
+      border-color: rgba(70, 211, 158, 1);
+    }
+    .pricing-card.popular {
+      border: 2px solid #46D39E;
+      background: linear-gradient(160deg, #141619, #141619);
+      color: #fff;
+    }
+    .pricing-card.popular:hover { box-shadow: 0 24px 60px rgba(26,43,76,0.35); }
+
+    /* ── Fade-in on scroll ── */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Nav scroll effect ── */
+    .navbar { transition: background 0.3s ease, box-shadow 0.3s ease; }
+    .navbar.scrolled { background: rgba(11, 32, 31, 0.97) !important; box-shadow: 0 4px 30px rgba(0,0,0,0.25); }
+
+    /* ── Badge tag ── */
+    .badge { font-size: 0.65rem; letter-spacing: 0.08em; font-weight: 600; text-transform: uppercase; }
+
+    /* ── Section number ── */
+    .section-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 6rem; font-weight: 700; line-height: 1;
+      color: rgba(212,175,55,0.1); user-select: none;
+      position: absolute; top: -1.5rem; left: -1rem;
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+<!-- ═══════════════════════════════════════ NAVBAR ═══ -->
+<nav id="navbar" class="navbar fixed top-0 left-0 right-0 z-50 bg-[#141619]/95 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2.5 group">
+      <img src="assets/kasacodelogo.png" alt="Logo" class="w-12 h-12 object-contain">
+      <div class="leading-tight">
+        <p class="text-white font-display font-semibold text-sm tracking-wide">Kasacode</p>
+        <p class="text-gold/70 text-[9px] tracking-[0.2em] uppercase">Studio</p>
+      </div>
+    </a>
+
+    <!-- Desktop Nav -->
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#portfolio" class="underline-gold text-white/80 hover:text-white text-sm font-medium transition-colors">Portofolio</a>
+      <a href="#layanan" class="underline-gold text-white/80 hover:text-white text-sm font-medium transition-colors">Kenapa Pilih Kami?</a>
+      <a href="#harga" class="underline-gold text-white/80 hover:text-white text-sm font-medium transition-colors">Paket</a>
+    </div>
+
+    <!-- CTA -->
+    <a href="https://wa.me/201559607582?text=Halo%20Kasacode%20Studio%2C%20saya%20ingin%20konsultasi%20gratis."
+       target="_blank"
+       class="btn-pulse hidden md:inline-flex items-center gap-2 bg-emerald hover:bg-emerald-light text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors shadow-lg">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Konsultasi Gratis
+    </a>
+
+    <!-- Mobile menu button -->
+    <button id="mobileMenuBtn" class="md:hidden text-white/80 hover:text-white">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="hidden md:hidden bg-[#141619]/95 border-t border-gold/20">
+    <div class="px-6 py-4 flex flex-col gap-4">
+      <a href="#portfolio" class="text-white/80 text-sm font-medium">Portofolio</a>
+      <a href="#layanan" class="text-white/80 text-sm font-medium">Kenapa Pilih Kami?</a>
+      <a href="#harga" class="text-white/80 text-sm font-medium">Harga</a>
+      <a href="https://wa.me/201559607582" target="_blank"
+         class="inline-flex items-center justify-center gap-2 bg-emerald text-white text-sm font-semibold px-5 py-2.5 rounded-full">
+        Konsultasi Gratis via WA
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════ HERO ═══ -->
+<section class="relative min-h-screen bg-navy noise overflow-hidden flex items-center pt-16">
+  <!-- Dot grid bg -->
+  <div class="dot-grid absolute inset-0 opacity-60"></div>
+  <!-- Gradient glow blobs -->
+  <div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-emerald/10 blur-[120px]"></div>
+  <div class="absolute -bottom-40 right-0 w-[500px] h-[500px] rounded-full bg-gold/10 blur-[100px]"></div>
+
+  <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-0 grid lg:grid-cols-2 gap-16 items-center w-full">
+    <!-- Text -->
+    <div class="order-2 lg:order-1">
+      <!-- Tag -->
+     
+      <h1 class="font-display text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.15] text-white mb-4 ">
+        Wajah Digital<br/>
+        <span class="italic text-navy efek-cta-keren">Premium</span> untuk<br/>
+        Bisnis Anda.
+      </h1>
+
+      <div class="gold-line w-24 my-6"></div>
+
+      <p class="text-white/60 text-base md:text-lg leading-relaxed max-w-md mb-10 font-light">
+        Kami merancang website yang tidak sekadar indah — tapi <span class="text-white font-medium">mengonversi pengunjung menjadi pelanggan</span>. Cepat, modern, dan siap bersaing.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="https://wa.me/201559607582?text=Halo%20Kasacode%20%20Studio%2C%20saya%20ingin%20konsultasi%20gratis."
+           target="_blank"
+           class="btn-pulse inline-flex items-center justify-center gap-3 bg-emerald hover:bg-emerald-light text-white font-semibold px-7 py-4 rounded-2xl transition-all shadow-xl shadow-emerald/30 text-sm md:text-base">
+          <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Konsultasi Gratis via WA
+        </a>
+        <a href="#portfolio"
+           class="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-gold/60 text-white/80 hover:text-white font-medium px-7 py-4 rounded-2xl transition-all text-sm md:text-base">
+          Lihat Portofolio
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex gap-8 mt-12 pt-10 border-t border-white/10">
+        <div>
+          <p class="font-display text-3xl font-bold text-gold">100%</p>
+          <p class="text-white/50 text-xs uppercase tracking-widest mt-1">Responsif di layar hp & pc</p>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <p class="font-display text-3xl font-bold text-gold">< 2 Detik</p>
+          <p class="text-white/50 text-xs uppercase tracking-widest mt-1">rata-rata kecepatan loading</p>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <p class="font-display text-3xl font-bold text-gold">< 3 Hari</p>
+          <p class="text-white/50 text-xs uppercase tracking-widest mt-1">Estimasi Pengerjaan Cepat</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Visual -->
+    <div class="order-1 lg:order-2 flex justify-center">
+      <div class="relative">
+        <!-- Glow ring -->
+        <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-gold/20 to-emerald/20 blur-3xl scale-110"></div>
+        <!-- Browser mockup -->
+        <div class="relative bg-navy rounded-3xl border border-white/10 overflow-hidden w-full max-w-sm shadow-2xl">
+          <!-- Browser bar -->
+          <div class="flex items-center gap-2 px-4 py-3 bg-navy/60 border-b border-white/10">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-400/60"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/60"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-green-400/60"></span>
+            <div class="flex-1 mx-3 bg-white/10 rounded-full h-5 flex items-center px-3">
+              <span class="text-white/30 text-[9px] truncate">websiteanda.com</span>
+            </div>
+          </div>
+          <!-- Screen preview placeholder -->
+          <div class="relative h-64 bg-gradient-to-br from-navy to-navy-light flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 dot-grid opacity-40"></div>
+            <div class="relative text-center">
+              <div class="w-16 h-16 rounded-2xl bg-gold/20 border border-gold/30 flex items-center justify-center mx-auto mb-3">
+                <span class="font-display text-gold text-2xl font-bold">M</span>
+              </div>
+              <p class="text-white/60 text-xs">websiteanda.com</p>
+              <div class="flex gap-1 mt-3 justify-center">
+                <span class="w-12 h-1.5 rounded-full bg-white/20"></span>
+                <span class="w-8 h-1.5 rounded-full bg-white/10"></span>
+                <span class="w-14 h-1.5 rounded-full bg-white/15"></span>
+              </div>
+            </div>
+            <!-- Floating badge -->
+            <div class="absolute bottom-4 right-4 bg-emerald/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+              Page Speed 99
+            </div>
+          </div>
+        </div>
+        <!-- Floating card 1 -->
+        <div class="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-2xl p-3 flex items-center gap-3 w-44">
+          <div class="w-10 h-10 rounded-xl bg-emerald/10 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-emerald" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+          </div>
+          <div>
+            <p class="text-navy font-bold text-sm">+127%</p>
+            <p class="text-navy/40 text-[10px]">Traffic Organik</p>
+          </div>
+        </div>
+        <!-- Floating card 2 -->
+        <div class="absolute -top-6 -right-6 bg-navy rounded-2xl shadow-xl border border-gold/30 p-3 flex items-center gap-2.5 w-36">
+          <div class="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+          <div>
+            <p class="text-white font-bold text-sm">5.0 ★</p>
+            <p class="text-white/40 text-[10px]">40 Review</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+ 
+    <span class="text-white/50 text-[10px] uppercase tracking-widest"></span>
+    <div class="w-px h-10 bg-gradient-to-b from-white/50 to-transparent"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ PORTFOLIO ═══ -->
+<section id="portfolio" class="py-24 lg:py-32 bg-offwhite">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 reveal">
+      <div class="relative">
+        <span class="section-num"></span>
+        <div class="relative z-10">
+          <span class="badge text-gold inline-block mb-3">Karya Kami</span>
+          <div class="gold-line w-12 mb-4"></div>
+          <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-navy leading-tight">
+            Portofolio<br/><span class="italic">Proyek</span>
+          </h2>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Project Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
+
+      <!-- ── Card 1 ── -->
+<div class="project-card reveal flex flex-col h-full" style="transition-delay:0.1s">
+  <div class="relative h-52 overflow-hidden bg-gradient-to-br from-[#141619] to-[#141619] flex-shrink-0">
+    
+    <!-- 1. BARIS YANG DIGANTI: Tag img di bawah ini menggantikan div placeholder lama -->
+    <img src="assets/mq.png" alt="Preview Markaz Quran" class="w-full h-full object-cover">
+
+    <!-- 2. TETAP PERTAHANKAN: Overlay tombol link di atas gambar -->
+    <div class="card-thumb-overlay">
+      <a href="https://markazquran.vercel.app" class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+    </div>
+    <div class=""></div>
+  </div>
+  
+  <div class="p-5 flex flex-col flex-1">
+    <h3 class="font-display text-lg font-semibold text-navy mb-2">Mediator Pendidikan Timur Tengah</h3>
+    <div class="flex flex-wrap gap-1.5 mb-5"></div>
+    
+    <div class="flex gap-2.5 mt-auto">
+      <a href="https://markazquran.vercel.app" target="_blank"
+         class="flex-1 flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-light text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-md shadow-navy/20">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Lihat Web Live (Demo)
+      </a>
+      <a href="https://wa.me/201559607582?text=Halo,%20saya%20tertarik%20dengan%20desain%Mediator%Pendidikan%Timur%20Tengah."
+         target="_blank"
+         class="flex-shrink-0 flex items-center gap-1.5 border border-emerald/40 hover:border-emerald hover:bg-emerald/5 text-navy/70 hover:text-navy text-xs font-semibold px-3.5 py-2.5 rounded-xl transition-colors">
+        <svg class="w-3.5 h-3.5 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Pesan Serupa
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Card 2 ── -->
+
+<div class="project-card reveal flex flex-col h-full" style="transition-delay:0.1s">
+  <div class="relative h-52 overflow-hidden bg-gradient-to-br from-[#141619] to-[#141619] flex-shrink-0">
+    
+    <!-- 1. BARIS YANG DIGANTI: Tag img di bawah ini menggantikan div placeholder lama -->
+    <img src="assets/klinik.png" alt="Preview Salon Kecantikan" class="w-full h-full object-cover">
+
+    <!-- 2. TETAP PERTAHANKAN: Overlay tombol link di atas gambar -->
+    <div class="card-thumb-overlay">
+      <a href="https://beautyclinic-one.vercel.app" class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+    </div>
+    <div class=""></div>
+  </div>
+  
+  <div class="p-5 flex flex-col flex-1">
+    <h3 class="font-display text-lg font-semibold text-navy mb-2">Salon Kecantikan</h3>
+    <div class="flex flex-wrap gap-1.5 mb-5"></div>
+    
+    <div class="flex gap-2.5 mt-auto">
+      <a href="https://beautyclinic-one.vercel.app/" target="_blank"
+         class="flex-1 flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-light text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-md shadow-navy/20">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Lihat Web Live (Demo)
+      </a>
+      <a href="https://wa.me/201559607582?text=Halo,%20saya%20tertarik%20dengan%20desain%Salon%Kecantikan."
+         target="_blank"
+         class="flex-shrink-0 flex items-center gap-1.5 border border-gold/40 hover:border-gold hover:bg-gold/5 text-navy/70 hover:text-navy text-xs font-semibold px-3.5 py-2.5 rounded-xl transition-colors">
+        <svg class="w-3.5 h-3.5 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Pesan Serupa
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Card 3 ── -->
+
+<div class="project-card reveal flex flex-col h-full" style="transition-delay:0.1s">
+  <div class="relative h-52 overflow-hidden bg-gradient-to-br from-[#141619] to-[#141619] flex-shrink-0">
+    
+    <!-- 1. BARIS YANG DIGANTI: Tag img di bawah ini menggantikan div placeholder lama -->
+    <img src="assets/aqiqah.png" alt="Preview Aqiqah" class="w-full h-full object-cover">
+
+    <!-- 2. TETAP PERTAHANKAN: Overlay tombol link di atas gambar -->
+    <div class="card-thumb-overlay">
+      <a href="https://hafs-aqiqah-webvercel.app" class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+    </div>
+    <div class=""></div>
+  </div>
+  <div class="p-5 flex flex-col flex-1">
+    <h3 class="font-display text-lg font-semibold text-navy mb-2">Jasa Aqiqah</h3>
+    <div class="flex flex-wrap gap-1.5 mb-5"></div>
+    
+    <div class="flex gap-2.5 mt-auto">
+      <a href="https://hafs-aqiqah-web.vercel.app/" target="_blank"
+         class="flex-1 flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-light text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-md shadow-navy/20">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Lihat Web Live (Demo)
+      </a>
+      <a href="https://wa.me/201559607582?text=Halo,%20saya%20tertarik%20dengan%20desain%20Jasa%20Aqiqah."
+         target="_blank"
+         class="flex-shrink-0 flex items-center gap-1.5 border border-gold/40 hover:border-gold hover:bg-gold/5 text-navy/70 hover:text-navy text-xs font-semibold px-3.5 py-2.5 rounded-xl transition-colors">
+        <svg class="w-3.5 h-3.5 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Pesan Serupa
+      </a>
+    </div>
+  </div>
+</div>
+
+    </div><!-- /grid -->
+
+    <!-- View more CTA -->
+    <div class="text-center mt-12 reveal">
+      <a href="https://wa.me/201559607582?text=Halo,%20saya%20ingin%20melihat%20portofolio%20lengkap." target="_blank"
+         class="inline-flex items-center gap-2 border-2 border-navy/20 hover:border-gold text-navy hover:text-navy font-semibold px-8 py-3.5 rounded-2xl transition-all text-sm hover:bg-gold/5">
+        Lihat Semua Portofolio
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ LAYANAN ═══ -->
+<section id="layanan" class="py-24 lg:py-32 bg-navy relative overflow-hidden">
+  <div class="dot-grid absolute inset-0 opacity-40"></div>
+  <div class="absolute top-0 right-0 w-96 h-96 bg-emerald/10 rounded-full blur-[120px]"></div>
+
+  <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
+    <!-- Header -->
+     <section id="keunggulan" class="py-20 ">
+    <div class="text-center mb-16 reveal">
+      <span class="badge text-gold/70 inline-block mb-3">Kenapa Pilih Kami?</span>
+      <div class="gold-line-center w-24 mx-auto mb-4"></div>
+      <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+        Layanan <span class="italic text-gold">Terima Beres</span>
+      </h2>
+      <p class="text-white/50 max-w-xl mx-auto text-sm leading-relaxed">
+        Anda fokus berbisnis, kami urus semua teknis website dari awal sampai online. Tanpa ribet, tanpa drama.
+      </p>
+    </div>
+
+    <!-- Feature grid -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="bg-white/5 border border-white/10 hover:border-gold/40 rounded-2xl p-6 transition-all hover:bg-white/8 reveal group" style="transition-delay:0.05s">
+        <div class="w-12 h-12 rounded-2xl bg-gold/15 border border-gold/25 flex items-center justify-center mb-4 group-hover:bg-gold/25 transition-colors">
+          <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2 text-sm">Desain Custom</h3>
+        <p class="text-white/45 text-xs leading-relaxed">Bukan template asal pakai — setiap piksel dirancang khusus sesuai brand & karakter bisnis Anda.</p>
+      </div>
+
+      <div class="bg-white/5 border border-white/10 hover:border-gold/40 rounded-2xl p-6 transition-all hover:bg-white/8 reveal group" style="transition-delay:0.1s">
+        <div class="w-12 h-12 rounded-2xl bg-emerald/15 border border-emerald/25 flex items-center justify-center mb-4 group-hover:bg-emerald/25 transition-colors">
+          <svg class="w-6 h-6 text-emerald" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2 text-sm">Kecepatan Tinggi</h3>
+        <p class="text-white/45 text-xs leading-relaxed">PageSpeed Score 90+ dijamin. Loading cepat = lebih banyak pengunjung yang bertahan = lebih banyak konversi.</p>
+      </div>
+
+      <div class="bg-white/5 border border-white/10 hover:border-gold/40 rounded-2xl p-6 transition-all hover:bg-white/8 reveal group" style="transition-delay:0.15s">
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/15 border border-blue-400/25 flex items-center justify-center mb-4 group-hover:bg-blue-500/25 transition-colors">
+          <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2 text-sm">Mobile Responsive</h3>
+        <p class="text-white/45 text-xs leading-relaxed">Tampil sempurna di HP, tablet, dan laptop. 80% pengunjung datang via mobile — jangan biarkan mereka pergi.</p>
+      </div>
+
+      <div class="bg-white/5 border border-white/10 hover:border-gold/40 rounded-2xl p-6 transition-all hover:bg-white/8 reveal group" style="transition-delay:0.2s">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/15 border border-purple-400/25 flex items-center justify-center mb-4 group-hover:bg-purple-500/25 transition-colors">
+          <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2 text-sm">Support 30 Hari</h3>
+        <p class="text-white/45 text-xs leading-relaxed">Garansi revisi & dukungan teknis gratis 30 hari pasca-launch. Anda tidak ditinggal begitu saja.</p>
+      </div>
+    </div>
+
+    <!-- Process strip -->
+    <div class="mt-16 bg-white/5 border border-white/10 rounded-3xl p-8 reveal">
+      <p class="text-gold/70 badge text-center mb-6 block">Proses Kerja 3 Langkah</p>
+      <div class="grid md:grid-cols-3 gap-6 relative">
+        <div class="hidden md:block absolute top-8 left-[calc(16.7%+1rem)] right-[calc(16.7%+1rem)] h-px bg-gradient-to-r from-gold/30 via-gold/60 to-gold/30"></div>
+        <div class="text-center relative">
+          <div class="w-16 h-16 rounded-full bg-gold text-navy font-display font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-gold/30">1</div>
+          <h4 class="text-white font-semibold text-sm mb-1">Konsultasi & Brief</h4>
+          <p class="text-white/40 text-xs">Chat WA gratis, kami pahami kebutuhan dan tujuan bisnis Anda.</p>
+        </div>
+        <div class="text-center relative">
+          <div class="w-16 h-16 rounded-full bg-gold text-navy font-display font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-gold/30">2</div>
+          <h4 class="text-white font-semibold text-sm mb-1">Desain & Development</h4>
+          <p class="text-white/40 text-xs">Tim kami mengerjakan website Anda dengan penuh dedikasi dan update berkala.</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 rounded-full bg-gold text-navy font-display font-bold text-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-gold/30">3</div>
+          <h4 class="text-white font-semibold text-sm mb-1">Launch & Handover</h4>
+          <p class="text-white/40 text-xs">Website live, domain aktif, dan Anda mendapat training penggunaan penuh.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ HARGA ═══ -->
+<section id="harga" class="py-24 lg:py-32 bg-offwhite">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="text-center mb-16 reveal">
+      <span class="badge text-gold inline-block mb-3">Investasi Terbaik Bisnis Anda</span>
+      <div class="gold-line-center w-24 mx-auto mb-4"></div>
+      <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-navy">
+        Pilihan <span class="italic">Paket</span>
+      </h2>
+      <p class="text-navy/50 mt-3 text-sm max-w-md mx-auto">Transparan, tanpa biaya tersembunyi. Pilih paket yang paling sesuai dengan kebutuhan bisnis Anda.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 items-stretch">
+
+      <!-- Starter -->
+      <div class="pricing-card p-7 reveal" style="transition-delay:0.05s">
+        <div class="mb-6">
+          <p class="badge text-navy/40 mb-3">Starter</p>
+          <div class="flex items-baseline gap-1">
+            <span class="text-navy/40 text-sm">Rp</span>
+            <span class="font-display text-4xl font-bold text-navy">1 Jt</span>
+          </div>
+          <p class="text-navy/40 text-xs mt-1">Pembayaran sekali bayar</p>
+        </div>
+        <div class="gold-line w-full mb-6"></div>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Landing Page 1 halaman</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Tombol WA Terintegrasi</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Mobile Responsive</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Hosting 1 Tahun Gratis</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/40 line-through"><svg class="w-4 h-4 text-navy/20 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>Multi-halaman</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/40 line-through"><svg class="w-4 h-4 text-navy/20 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>Sistem Pemesanan</li>
+        </ul>
+        <a href="https://wa.me/201559607582?text=Halo,%20saya%20tertarik%20paket%20Starter." target="_blank"
+           class="block text-center bg-navy hover:bg-navy-light text-white font-semibold text-sm px-5 py-3 rounded-xl transition-all shadow-md">
+          Pilih Paket Ini
+        </a>
+      </div>
+
+      <!-- Pro (Popular) -->
+      <div class="pricing-card popular p-7 reveal relative" style="transition-delay:0.15s">
+        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gold text-navy badge px-4 py-1 rounded-full shadow-lg">
+          ⭐ Paling Populer
+        </div>
+        <div class="mb-6 mt-2">
+          <p class="badge text-gold/70 mb-3">Professional</p>
+          <div class="flex items-baseline gap-1">
+            <span class="text-white/60 text-sm">Rp</span>
+            <span class="font-display text-4xl font-bold text-white">1,25 Jt</span>
+          </div>
+          <p class="text-white/40 text-xs mt-1">Pembayaran sekali bayar</p>
+        </div>
+        <div class="h-px bg-gold/30 mb-6"></div>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-center gap-2.5 text-sm text-white/80"><svg class="w-4 h-4 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Maksimum 7 Halaman</li>
+          <li class="flex items-center gap-2.5 text-sm text-white/80"><svg class="w-4 h-4 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Sistem Reservasi / Pemesanan WA</li>
+          <li class="flex items-center gap-2.5 text-sm text-white/80"><svg class="w-4 h-4 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>SEO On-Page Lengkap</li>
+          <li class="flex items-center gap-2.5 text-sm text-white/80"><svg class="w-4 h-4 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Domain .com 1 Tahun Gratis</li>
+
+          <li class="flex items-center gap-2.5 text-sm text-white/80"><svg class="w-4 h-4 text-gold flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Google Analytics Terpasang</li>
+        </ul>
+        <a href="https://wa.me/201559607582?text=Halo,%20saya%20tertarik%20paket%20Professional." target="_blank"
+           class="block text-center bg-gold hover:bg-gold-light text-navy font-bold text-sm px-5 py-3 rounded-xl transition-all shadow-lg shadow-gold/30">
+          Pilih Paket Ini
+        </a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card p-7 reveal" style="transition-delay:0.25s">
+        <div class="mb-6">
+          <p class="badge text-navy/40 mb-3">Enterprise</p>
+          <div class="flex items-baseline gap-1">
+            <span class="text-navy/40 text-sm">Mulai</span>
+            <span class="font-display text-4xl font-bold text-navy">2 Jt</span>
+          </div>
+          <p class="text-navy/40 text-xs mt-1">Harga menyesuaikan kebutuhan</p>
+        </div>
+        <div class="gold-line w-full mb-6"></div>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Halaman Tak Terbatas</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Toko Online + Payment Gateway</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Dashboard Admin Khusus</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Integrasi API Pihak Ketiga</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Maintenance Bulanan</li>
+          <li class="flex items-center gap-2.5 text-sm text-navy/70"><svg class="w-4 h-4 text-emerald flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Dedicated Project Manager</li>
+        </ul>
+        <a href="https://wa.me/201559607582?text=Halo,%20saya%20ingin%20diskusi%20paket%20Enterprise%20untuk%20bisnis%20saya." target="_blank"
+           class="block text-center bg-navy hover:bg-navy-light text-white font-semibold text-sm px-5 py-3 rounded-xl transition-all shadow-md">
+          Pilih Paket Ini
+        
+        </a>
+      </div>
+    </div>
+
+    <!-- Trust badges -->
+    <div class="flex flex-wrap justify-center gap-6 mt-12 text-center reveal">
+      <div class="flex items-center gap-2 text-navy/40 text-xs">
+        <svg class="w-4 h-4 text-emerald" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        Garansi Uang Kembali 
+      </div>
+      <div class="flex items-center gap-2 text-navy/40 text-xs">
+        <svg class="w-4 h-4 text-emerald" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        Tanpa Kontrak Panjang
+      </div>
+      <div class="flex items-center gap-2 text-navy/40 text-xs">
+        <svg class="w-4 h-4 text-emerald" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        Revisi Gratis (S&K Berlaku)
+      </div>
+      <div class="flex items-center gap-2 text-navy/40 text-xs">
+        <svg class="w-4 h-4 text-emerald" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        Pembayaran Fleksibel 
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ CTA FINAL ═══ -->
+<section class="py-20 bg-navy relative overflow-hidden">
+  <div class="absolute inset-0 dot-grid opacity-30"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-emerald/10 rounded-full blur-[100px]"></div>
+  <div class="relative max-w-3xl mx-auto px-6 text-center reveal">
+    <span class="badge text-gold/70 inline-block mb-4">Siap Memulai?</span>
+    <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+      Website Impian Anda<br/><span class="italic text-gold">Dimulai dari Sini</span>
+    </h2>
+    <div class="gold-line-center w-24 mx-auto my-6"></div>
+    <p class="text-white/50 text-sm leading-relaxed mb-10 max-w-md mx-auto">
+      Konsultasi gratis 15 menit via WhatsApp. Tidak ada kewajiban apapun — cukup ceritakan kebutuhan Anda.
+    </p>
+    <a href="https://wa.me/201559607582?text=Halo%20Kasacode%20Digital%20Studio%2C%20saya%20ingin%20konsultasi%20gratis%20tentang%20website%20bisnis%20saya."
+       target="_blank"
+       class="btn-pulse inline-flex items-center gap-3 bg-emerald hover:bg-emerald-light text-white font-bold px-10 py-5 rounded-2xl text-base transition-all shadow-2xl shadow-emerald/30">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Mulai Konsultasi Gratis Sekarang
+    </a>
+    <p class="text-white/25 text-xs mt-4"></p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ FOOTER ═══ -->
+<footer class="bg-navy-dark border-t border-white/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 py-14">
+    <div class="grid md:grid-cols-3 gap-10 mb-10">
+      <!-- Brand -->
+      <div>
+        <div class="flex items-center gap-2.5 mb-4">
+          <img src="assets/kasacodelogo.png" alt="Logo" class="w-12 h-12 object-contain">
+          <div>
+            <p class="text-white font-display font-semibold text-sm">Kasacode Studio</p>
+            <p class="text-gold/50 text-[9px] tracking-widest uppercase">Web Development</p>
+          </div>
+        </div>
+        <p class="text-white/35 text-xs leading-relaxed max-w-xs">
+          Wajah Digital Premium Anda. Kami membangun website yang bukan sekadar tampilan — tapi mesin penghasil pelanggan.
+        </p>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <h4 class="text-white/50 badge mb-4">Navigasi</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#portfolio" class="text-white/40 hover:text-gold text-sm transition-colors">Portofolio</a></li>
+          <li><a href="#layanan" class="text-white/40 hover:text-gold text-sm transition-colors">Kenapa Pilih Kami?</a></li>
+          <li><a href="#harga" class="text-white/40 hover:text-gold text-sm transition-colors">Harga</a></li>
+          <li><a href="https://wa.me/201559607582" target="_blank" class="text-white/40 hover:text-gold text-sm transition-colors">Konsultasi Gratis</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="text-white/50 badge mb-4">Hubungi Kami</h4>
+        <ul class="space-y-3">
+          <li>
+            <a href="https://wa.me/201559607582" target="_blank" class="flex items-center gap-2.5 text-white/40 hover:text-white transition-colors group">
+              <svg class="w-4 h-4 text-emerald group-hover:scale-110 transition-transform flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              <span class="text-sm">+20 15 59607582</span>
+            </a>
+          </li>
+          <li>
+            <a href="mailto:ukasyahmuftip@gmail.com" class="flex items-center gap-2.5 text-white/40 hover:text-white transition-colors group">
+              <svg class="w-4 h-4 text-gold group-hover:scale-110 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span class="text-sm">ukasyahmuftip@gmail.com</span>
+            </a>
+          </li>
+          <li>
+  <a href="https://maps.app.goo.gl/7jeQBha7FP4LVGDg7" target="_blank" class="flex items-start gap-2.5 text-white/40 hover:text-white transition-colors group">
+    <svg class="w-4 h-4 text-gold group-hover:scale-110 transition-transform flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+    <span class="text-sm">Kairo, Mesir</span>
+  </a>
+</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="h-px bg-white/5 mb-6"></div>
+    <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+      <p class="text-white/25 text-xs">© 2026 Kasacode Studio. Seluruh hak cipta dilindungi.</p>
+      <p class="text-white/20 text-xs italic font-display">Wajah Digital Premium Anda.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════ JS ═══ -->
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+
+  // Mobile menu toggle
+  const btn = document.getElementById('mobileMenuBtn');
+  const menu = document.getElementById('mobileMenu');
+  btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => menu.classList.add('hidden')));
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
